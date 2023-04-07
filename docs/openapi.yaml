@@ -17,1203 +17,984 @@ servers:
     variables: {}
     description: Development server
 tags:
-  - name: account
+  - name: accounts
     description: All about accounts
+  - name: profiles
+    description: All about profiles
+  - name: follows
+    description: All about profiles followers and followings
 paths:
   /accounts:
-    get:
-      tags:
-      - account
-      summary: Find all accounts
-      description: Find all the accounts and return them in an array
-      operationId: findAllAccounts
-      responses:
-        '200':
-          description: All accounts found and returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseFindAllAccounts'
     post:
       tags:
-      - account
-      summary: Add an account
-      description: Add a new account and return the saved one
-      operationId: addAcccount
+        - accounts
+      summary: Account subscription
+      description: Account subscription
+      operationId: addAccount
       requestBody:
         description: The new account
         required: true
         content:
-          applcation/json:
+          application/json:
             schema:
-              allOf:
-               - $ref: '#/components/schemas/Account'
-              required:
-              - email
-              - name
-              - surname
-              - brthdate
-              - password
-              - crc
-              example:
-                email: pinco_pallino@gmail.com
-                name: Pinco
-                surname: Pallino
-                birthdate: 1980-05-14
-                gender: male
-                password: ab324bnmbnew
-                crc: aadadeweewer
-                version: 0
+              $ref: '#/components/schemas/Account'
       responses:
         '201':
-          description: Account added and returned
+          description:  Account created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseAddAccount'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  email:
+                    type: string
+                    format: email
+                    minLength: 3
+                    maxLength: 320
+                  name:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                  surname:
+                    type: string
+                    minLength: 2
+                    maxLength: 50
+                  birthdate:
+                    type: string
+                    format: date-time
+                  gender:
+                    type: string
+                    enum: [MALE, FEMALE, OTHER]
+                required:
+                - id
+                - email
+                - birthdate
+                - gender
         '400':
-          description: Bad Request, account not added
+          description: Bad request! Account was not created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseAddAccountBadRequest'
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    example: ['birthdate is mandatory','gender is mandatory']
+                    items:
+                      type: string
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Account'
+                    example:
+                      email: user@example.com
+                      name: string
+                      surname: string
+                      birthdate: null
+                      gender: null
+                required:
+                - errors
+                - data
+        '409':
+          description: Conflict! Account already created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 1
+                    example: Email already exists  
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        format: email
+                        minLength: 3
+                        maxLength: 320
+                    required:
+                    - email
+                required:
+                - error
+                - data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
   /accounts/{accountId}:
-    get:
+    put:
       tags:
-        - account
-      summary: Find an account
-      description: Find an account by Id
-      operationId: findAccountById
+        - accounts
+      summary: Account activation
+      description: Account activation
+      operationId: activateAccountById
       parameters:
-        - in: path
-          name: accountId
+        - name: accountId
+          in: path
+          description: Id of the account to be activated
           required: true
           schema:
             type: integer
             format: int64
-            example: 1
-          description: The account Id
-      responses:
-        '200':
-          description: Account found and returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseFindOneAccount'
-        '404':
-          description: Account not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseAccountNotFound'
-    put:
-      tags: 
-        - account
-      summary: Update an account
-      description: Update an account and return the updated one
-      operationId: updateAccountById
-      parameters:
-          - in: path
-            name: accountId
-            required: true
-            schema:
-              type: integer
-              format: int64
-              example: 1
-            description: The account Id
       requestBody:
-        required: true
-        description: the account with updated values.
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/Account'
+              type: object
+              properties:
+                crc:
+                  type: string
+                  minLength: 2
+                  maxLength: 255
               required:
-                - email
-                - name
-                - surname
-                - brthdate
-                - password
-              example:
-                email: pinco_pallino@outlook.com
-                name: Pinco
-                surname: Pallino
-                birthdate: 1980-05-14
-                gender: male
-                password: ab324bnmbnew
-                validated_at: 2023-04-04T16:08:30Z
-                updated_at: 2023-06-05T20:05:20Z
-                deleted_at: null
-                version: 2
+                - crc
       responses:
-        '200':
-          description: Account updated and returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseUpdateAccount'
+        '204':
+          description: Account has been successfully activated!
         '400':
-          description: Bad Request, account not updated
+          description: Bad Request! The account has not been activated!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseAccountBadRequest'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'crc is mandatory'
+                  data:
+                    type: object
+                    properties:
+                      crc:
+                        type: string
+                        minLength: 2
+                        maxLength: 255
+                        example: null
+                    required:
+                      - crc
+                required:
+                - errors
+                - data
         '404':
-          description: Account not found
+          description: Account Not Found! The account has not been activated!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseAccountNotFound'
-      
+                $ref: '#/components/schemas/Account404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
     delete:
-      tags: 
-        - account
+      tags:
+        - accounts
       summary: Delete an account
       description: Delete an account
       operationId: deleteAccountById
       parameters:
-          - in: path
-            name: accountId
-            required: true
-            schema:
-              type: integer
-              format: int64
-              example: 1
-            description: The account Id
-      responses:
-        '200':
-          description: Account deleted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseDeleteAccount'
-        '404':
-          description: Account not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseAccountNotFound'        
-  /profiles:
-    get:
-      tags:
-      - profile
-      summary: Find all profiles
-      description: Find all the profiles and return them in an array
-      operationId: findAllProfiles
-      responses:
-        '200':
-          description: All profiles found and returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseFindAllProfiles'
-    post:
-      tags:
-      - profile
-      summary: Add a profile
-      description: Add a new profile and return the saved one
-      operationId: addProfile
-      requestBody:
-        description: The new profile
-        required: true
-        content:
-          applcation/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/Profile'
-              required:
-              - profile_name
-              - bio
-              - picture_url
-              - is_private
-              - account
-      responses:
-        '201':
-          description: Account added and returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseAddProfile'
-        '400':
-          description: Bad Request, account not added
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponseAddProfileBadRequest'
-                
-  /profiles/{profileId}:
-    get:
-      tags:
-        - profile
-      summary: Find a profile
-      description: Find a profile by Id
-      operationId: findProfiletById
-      parameters:
-        - in: path
-          name: profileId
+        - name: accountId
+          in: path
+          description: Id of the account to be deleted
           required: true
           schema:
             type: integer
             format: int64
-            example: 1
-          description: The profile Id
       responses:
-        '200':
-          description: Profile found and returned
+        '204':
+          description: Account has been successfully deleted!
+        '400':
+          description: Bad request! Ids not valid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseFindOneProfile'
+                $ref: '#/components/schemas/IdBadRequest'
         '404':
-          description: Profile not found
+          description: Account Not Found! The account has not been deleted!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseProfileNotFound'
-                
-    put:
-      tags: 
-        - profile
-      summary: Update a profile
-      description: Update a profile and return the updated one
-      operationId: updateProfileById
+                $ref: '#/components/schemas/Account404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      
+    patch:
+      tags:
+        - accounts
+      summary: Update an account
+      description: Update name, surname, gender or password of an account
+      operationId: updateAccountById
       parameters:
-          - in: path
-            name: profileId
-            required: true
-            schema:
-              type: integer
-              format: int64
-              example: 1
-            description: The profile Id
-      requestBody:
+      - name: accountId
+        in: path
+        description: Id of the account to be updated
         required: true
-        description: the profile with updated values.
+        schema:
+          type: integer
+          format: int64
+      requestBody:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/Profile'
-              required:
-              - profile_name
-              - bio
-              - picture_url
-              - is_private
-              - account
-              example:
-                profile_name: pinco_pallino
-                bio: 'Questo è il profilo di Pinco Pallino'
-                picture_url: null
-                is_private: true
-                created_at: 2023-04-04T16:08:30Z
-                updated_at: 2023-06-05T20:05:20Z
-                deleted_at: null
-                blocked_until: null
-                version: 2
-                account:
-                  id: 1
-                  email: pinco_pallino@gmail.com
-                  name: Pinco
-                  surname: Pallino
-                  birthdate: 1980-05-14
-                  gender: male
-                  password: ab324bnmbnew
-                  crc: aadadeweewer
-                  validated_at: 2023-04-04T16:08:30Z
-                  updated_at: 2023-06-05T20:05:20Z
-                  deleted_at: null
-                  version: 1
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                surname:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                gender:
+                  type: string
+                  enum: [MALE, FEMALE, OTHER]
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  maxLength: 255
+                  writeOnly: true
       responses:
         '200':
-          description: Profile updated and returned
+          description: Account has been successfully updated!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseUpdateProfile'
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Account Not Found! The account has not been activated!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /profiles:
+    post:
+      tags:
+        - profiles
+      summary: Create a profile
+      description: create a profile
+      operationId: addProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        '201':
+          description: Profile created!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
         '400':
-          description: Bad Request, profile not updated
+          description: Bad request! Profile has not been created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseProfileBadRequest'
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ['profile_name is mandatory','is_private is mandatory']
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Profile'
+                    example:
+                      profile_name: null
+                      bio: string
+                      picture_url: string
+                      is_private: null
+                required:
+                - errors
+                - data
+        '409':
+          description: Conflict! Profile already created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 1
+                    example: Profile already exists 
+                  data:
+                    $ref: '#/components/schemas/Profile'
+                required:
+                - errors
+                - data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /profiles/{profileId}:
+    get:
+      tags:
+        - profiles
+      summary: Find a profile
+      description: Find a profile by id
+      operationId: findProfileById
+      parameters:
+        - name: profileId
+          in: path
+          description: Profile id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Profile found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'#Questo da cambiare con FullProfile con i post
+        '400':
+          description: Bad request! Ids not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
         '404':
           description: Profile not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseProfileNotFound'
+                $ref: '#/components/schemas/Profile404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
+    patch:
+      tags:
+        - profiles
+      summary: Update a profile
+      description: Update a profile by id
+      operationId: updateProfileById
+      parameters:
+        - name: profileId
+          in: path
+          description: Profile id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_name:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+                bio:
+                  type: string
+                  maxLength: 150
+                picture_url:
+                  type: string
+                is_private:
+                  type: boolean
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 1
+                    example: Bad Request
+                  data:
+                    type: object
+                    properties:
+                      profile_name:
+                        type: string
+                        minLength: 3
+                        maxLength: 30
+                      bio:
+                        type: string
+                        maxLength: 150
+                      picture_url:
+                        type: string
+                      is_private:
+                        type: boolean
+                required:
+                - error
+                - data
+        '409':
+          description: Conflict! Profile name already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 1
+                    example: Profile name already exists
+                  data:
+                    type: object
+                    properties:
+                      profile_name:
+                        type: string
+                        minLength: 3
+                required:
+                - error
+                - data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
                 
+      
     delete:
-      tags: 
-        - profile
+      tags:
+        - profiles
       summary: Delete a profile
       description: Delete a profile
       operationId: deleteProfileById
       parameters:
-          - in: path
-            name: profileId
-            required: true
-            schema:
-              type: integer
-              format: int64
-              example: 1
-            description: The profile Id
+        - name: profileId
+          in: path
+          description: Id of the profile to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        '200':
-          description: Profile deleted
+        '204':
+          description: Profile has been successfully deleted!
+        '400':
+          description: Bad request! Ids not valid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseDeleteProfile'
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile Not Found! The account has not been deleted!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
+  /profiles/search:
+    get:
+      tags:
+        - profiles
+      summary: Search profiles by name
+      description: Seach profiles by name
+      operationId: searchProfileByProfileName
+      parameters:
+        - name: profileName
+          in: query
+          description: Profile Name
+          required: true
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 30
+      responses:
+        '200':
+          description: Profiles found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      readOnly: true
+                    profile_name:
+                      type: string
+                      minLength: 3
+                      maxLength: 30
+                    picture_url:
+                      type: string
+                  required:
+                    - id
+                    - profile_name
+                    - picture_url
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
+  /profiles/{profileId}/follows/{followsId}:
+    post:
+      tags:
+        - follows
+      summary: A profile follows another profile
+      description: A profile follows another profile
+      operationId: addFollows
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the profile that want to follow another profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: followsId
+          in: path
+          description: Id of the profile that another profile want to follow
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: You are following the profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follows'
+        '202':
+          description: The private profile that you want to follow has recived the request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Follows'
+                example:
+                  follower_id: 1
+                  followed_id: 2
+                  accepted: false
+        '400':
+          description: Bad request! Ids not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
         '404':
           description: Profile not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseProfileNotFound'
+                $ref: '#/components/schemas/Profile404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
                 
-  /follows/{followsId}:
-    post:
+    delete:
       tags:
         - follows
-      summary: Follow a profile
-      description: Follow a profile
-      operationId: addFollows
+      summary: Delete a following
+      description: Delete a following
+      operationId: deleteFollowing
       parameters:
-          - in: path
-            name: followsId
-            required: true
-            schema:
-              type: integer
-              format: int64
-              example: 1
-            description: The follows Id
-      requestBody:
-        description: The new profile
-        required: true
-        content:
-          applcation/json:
-            schema:
-              $ref: '#/components/schemas/Follows'
+        - name: profileId
+          in: path
+          description: Id of the  profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: followsId
+          in: path
+          description: Id of the profile that you want to unfollow
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        '201':
-          description: Profile followed
+        '204':
+          description: Profile has been successfully unfollowed!
+        '400':
+          description: Bad request! Ids not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /profiles/{profileId}/followedBy/{followerId}:   
+    patch:
+      tags:
+        - follows
+      summary: Accept follow request for private profile
+      description: Accept follow request for private profile
+      operationId: accpetFollows
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the private profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: followerId
+          in: path
+          description: Id of the profile that sent the follow request
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accepted: 
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Follow request accepted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Follows'
+        '400':
+          description: Bad request! Ids not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 3
+                    example: Profile not found
+                required:
+                - error
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        
+        
+    delete:
+      tags:
+        - follows
+      summary: Block a follower
+      description: Block a follower
+      operationId: deleteFollower
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the  profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: followerId
+          in: path
+          description: Id of the profile that you want to block
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Profile has been successfully blocked!
+        '400':
+          description: Bad request! Ids not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile404'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
                 
   /profiles/{profileId}/followers:
     get:
       tags:
         - follows
-      summary: Find followers
-      description: Find all the followers of a profile
-      operationId: findAllFollowers
+      summary: Get profile followers
+      description: Get profile followers
       parameters:
-        - in: path
-          name: profileId
+        - name: profileId
+          in: path
+          description: Id of the profile
           required: true
           schema:
             type: integer
             format: int64
-            example: 1
-          description: The profile Id
       responses:
         '200':
-          description: All followers found and returned
+          description: Followers list returned
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseFindAllFollowers'
+                $ref: '#/components/schemas/ProfileList'
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
         '404':
           description: Profile not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponseProfileNotFound' 
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 3
+                    example: Profile not found
+                required:
+                - error
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /profiles/{profileId}/followings:
+    get:
+      tags:
+        - follows
+      summary: Get profile followings
+      description: Get profile followings
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Followings list returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileList'
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 3
+                    example: Profile not found
+                required:
+                - error
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /profiles/{profileId}/followed/{followerId}:              
+
+      
 components:
   schemas:
+    
     Account:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          nullable: false
-          example: 1 
-          readOnly: true
         email:
           type: string
           format: email
-          nullable: false
-          example: pinco_pallino@gmail.com
+          minLength: 3
+          maxLength: 320
         name:
           type: string
-          nullable: false
           minLength: 2
           maxLength: 50
-          example: Pinco
         surname:
           type: string
-          nullable: false
           minLength: 2
           maxLength: 50
-          example: Pallino
         birthdate:
           type: string
           format: date
-          nullable: false
-          example: 1980-05-14
         gender:
           type: string
-          nullable: true
-          enum: [male, female, null]
-          example: male
+          enum: [MALE, FEMALE, OTHER]
         password:
           type: string
           format: password
-          nullable: false
-          minLength: 5
+          minLength: 8
           maxLength: 255
-          example: ab324bnmbnew
-        crc:
-          type: string
-          maxLength: 255
-          nullable: true
-          example: aadadeweewer
-        validated_at:
-          type: string
-          format: date-time
-          nullable: false
-          example: 2023-04-04T16:08:30Z
-        updated_at:
-          type: string
-          format: date-time
-          nullable: true
-          example: 2023-06-05T20:05:20Z
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        version:
-          type: integer
-          format: int64
-          nullable: false
-          example: 1
-        profiles:
-          $ref: '#/components/schemas/ProfileList'
-          
+          writeOnly: true
+      required:
+        - email
+        - birthdate
+        - gender
+        - password
+
     Profile:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          nullable: false
           readOnly: true
-          example: 1
         profile_name:
           type: string
-          nullable: false
           minLength: 3
           maxLength: 30
-          example: pinco_pallino
         bio:
           type: string
-          nullable: true
           maxLength: 150
-          example: Questo è il profilo di Pinco Pallino
         picture_url:
           type: string
-          nullable: true
-          example: https://t3.ftcdn.net/jpg/03/42/99/68/360_F_342996846_tHMepJOsXWwbvMpG7uiYpE68wbfQ9e4s.jpg
         is_private:
           type: boolean
-          nullable: false
-          example: false
-        created_at:
-          type: string
-          format: date-time
-          nullable: false
-          example: 2023-04-04T16:08:30Z
-        updated_at:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        blocked_until:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        version:
-          type: integer
-          format: int64
-          nullable: false
-          example: 1
-        account:
-          $ref: '#/components/schemas/Account'
-        followers:
-          $ref: '#/components/schemas/FollowsList'
-        followings:
-          $ref: '#/components/schemas/FollowsList'
-        
+      required:
+        - profile_name
+        - is_private
+      
+     
     Follows:
       type: object
       properties:
-        follows_id:
-          $ref: '#/components/schemas/FollowsId'
-        accepted:
-          type: boolean
-          nullable: false
-          example: true
-        followed_at:
-          type: string
-          format: date-time
-          nullable: false
-          example: 2023-04-04T16:08:30Z
-        unfollowed_at:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        version:
+        follower_id:
           type: integer
           format: int64
-          nullable: false
           example: 1
-          
-    FollowsId:
-      type: object
-      properties:
-        follower_id:
-          $ref: '#/components/schemas/Profile'
-        follows_id:
-          $ref: '#/components/schemas/Profile'
-        
-    AccountList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Account'
-      example:
-        - id: 1
-          email: pinco_pallino@gmail.com
-          name: Pinco
-          surname: Pallino
-          birthdate: 1980-05-14
-          gender: male
-          password: ab324bnmbnew
-          crc: aadadeweewer
-          validated_at: 2023-04-04T16:08:30Z
-          updated_at: 2023-06-05T20:05:20Z
-          deleted_at: null
-          version: 1
-        - id: 2
-          email: mario.rossi@gmail.com
-          name: Mario
-          surname: Rossi
-          birthdate: 1989-03-17
-          gender: male
-          password: retiuyyiurtiu
-          crc: 3426hbfdgsdg
-          validated_at: 2023-04-04T16:08:30Z
-          updated_at: 2023-06-05T20:05:20Z
-          deleted_at: 2023-07-21T10:25:34Z
-          version: 1
-        
+        followed_id:
+          type: integer
+          format: int64
+          example: 2
+        accepted:
+          type: boolean
+      required:
+        - follower_id
+        - followed_id
+        - accepted
+    
     ProfileList:
       type: array
       items:
         $ref: '#/components/schemas/Profile'
-      example:
-        - id: 1
-          profile_name: pinco_pallino
-          bio: Questo è il profilo di Pinco Pallino
-          picture_url: https://t3.ftcdn.net/jpg/03/42/99/68/360_F_342996846_tHMepJOsXWwbvMpG7uiYpE68wbfQ9e4s.jpg
-          is_pivate: false
-          created_at: 2023-04-04T16:08:30Z
-          updated_at: null
-          deleted_at: null
-          blocked_untill: null
-          version: 1
-          account:
-            id: 1
-            email: pinco_pallino@gmail.com
-            name: Pinco
-            surname: Pallino
-            birthdate: 1980-05-14
-            gender: male
-            password: ab324bnmbnew
-            crc: aadadeweewer
-            validated_at: 2023-04-04T16:08:30Z
-            updated_at: 2023-06-05T20:05:20Z
-            deleted_at: null
-            version: 1
-        - id: 2
-          profile_name: mario.rossi
-          bio:  null
-          picture_url: null
-          is_pivate: true
-          created_at: 2023-04-04T16:08:30Z
-          updated_at: 2023-06-05T20:05:20Z
-          deleted_at: 2023-07-21T10:25:34Z
-          blocked_untill: null
-          version: 1
-          account:
-            id: 2
-            email: mario.rossi@gmail.com
-            name: Mario
-            surname: Rossi
-            birthdate: 1989-03-17
-            gender: male
-            password: retiuyyiurtiu
-            crc: 3426hbfdgsdg
-            validated_at: 2023-04-04T16:08:30Z
-            updated_at: 2023-06-05T20:05:20Z
-            deleted_at: 2023-07-21T10:25:34Z
-            version: 1
-           
-    FollowsList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Follows'
-        
-    ApiResponseFindAllAccounts:
+    
+    Account404:
       type: object
       properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Accounts returned
-        data:
-          $ref: '#/components/schemas/AccountList'
-          
-    ApiResponseAddAccount:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 201
-        message:
-          type: string
-          description: Http status description
-          example: Account created
-        data:
-          $ref: '#/components/schemas/Account'
-      example:
-        flag: true
-        code: 201
-        message: Account created
-        data:
-          id: 1
-          email: pinco_pallino@gmail.com
-          name: Pinco
-          surname: Pallino
-          birthdate: 1980-05-14
-          gender: male
-          password: ab324bnmbnew
-          crc: aadadeweewer
-          validated_at: null
-          updated_at: null
-          deleted_at: null
-          version: 0
-        
-          
-    ApiResponseAccountBadRequest:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 400
-        message:
-          type: string
-          description: Http status description
-          example: Account not updated! Data provided are invalid!
-        data:
-          $ref: '#/components/schemas/AccountBadRequest'
-          
-    ApiResponseAddAccountBadRequest:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 400
-        message:
-          type: string
-          description: Http status description
-          example: Account not created! Data provided are invalid!
-        data:
-        
-          $ref: '#/components/schemas/AddAccountBadRequest'
-          
-    AddAccountBadRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          example: 'email is required'
-        name:
-          type: string
-          example: 'name is required'
-        surname:
-          type: string
-          example: 'surname is required'
-        birthdate:
-          type: string
-          example: 'birthdate is required'
-        gender:
-          type: string
-          example: 'gender is required'
-        password:
-          type: string
-          example: 'password is required'
-        crc:
-          type: string
-          example: 'crc is required'
-        version:
-          type: string
-          example: 'version is required'  
-      
-    AccountBadRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          example: 'email is required'
-        name:
-          type: string
-          example: 'name is required'
-        surname:
-          type: string
-          example: 'surname is required'
-        birthdate:
-          type: string
-          example: 'birthdate is required'
-        gender:
-          type: string
-          example: 'gender is required'
-        password:
-          type: string
-          example: 'password is required'
-        updated_at:
-          type: string
-          example: 'updated_at is required'
-        deleted_at:
-          type: string
-          example: 'deleted_at is required'
-        version:
-          type: string
-          example: 'version is required'
-          
-    ApiResponseFindOneAccount:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Accounts returned
-        data:
-          $ref: '#/components/schemas/Account'
-          
-    ApiResponseAccountNotFound:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 404
-        message:
-          type: string
-          description: Http status description
-          example: Account with id 1 not found!
-        data:
-          type: object
-          example: null
-          
-    ApiResponseUpdateAccount:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Account with id 1 has been successfully updated!
-        data:
-          allOf:
-            - $ref: '#/components/schemas/Account'
-          example:
-              id: 1
-              email: pinco_pallino@outlook.com
-              name: Pinco
-              surname: Pallino
-              birthdate: 1980-05-14
-              gender: male
-              password: ab324bnmbnew
-              validated_at: 2023-04-04T16:08:30Z
-              updated_at: 2023-06-05T20:05:20Z
-              deleted_at: null
-              version: 2
-              
-    ApiResponseDeleteAccount:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Account with id 1 has been successfully deleted!
-        data:
-          type: object
-          example: null
+        errors:
+          type: array
+          example: ['Account Not found']
+          items:
+            type: string
+      required:
+      - error
 
-          
-    ApiResponseFindAllProfiles:
+    Profile404:
       type: object
       properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
+        error:
           type: string
-          description: Http status description
-          example: All profiles found
-        data:
-          $ref: '#/components/schemas/ProfileList'
-            
-    ApiResponseAddProfile:
+          minLength: 1
+          example: Profile not found
+      required:
+      - error
+    
+    IdBadRequest:
       type: object
       properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 201
-        message:
+        error: 
           type: string
-          description: Http status description
-          example: Profile created
-        data:
-          $ref: '#/components/schemas/Profile'
-
-    ApiResponseAddProfileBadRequest:
+          minLength: 3
+          example: Bad request! Id not valid
+    
+    InternalServerError:
       type: object
       properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 400
-        message:
+        error:
           type: string
-          description: Http status description
-          example: Profile not created! Data provided are invalid!
-        data:
-        
-          $ref: '#/components/schemas/AddProfileBadRequest'
-          
-    AddProfileBadRequest:
-      type: object
-      properties:
-        profile_name:
-          type: string
-          example: 'profile_name is required'
-        is_private:
-          type: string
-          example: 'is_private is required'
-        created_at:
-          type: string
-          example: 'created_at is required'
-        version:
-          type: string
-          example: 'version is required'
-        account:
-          type: string
-          example: 'account is required'
-
-    ApiResponseFindOneProfile:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Profile returned
-        data:
-          $ref: '#/components/schemas/Profile'
-          
-    ApiResponseProfileNotFound:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 404
-        message:
-          type: string
-          description: Http status description
-          example: Profile with id 1 not found!
-        data:
-          type: object
-          example: null
-
-    ApiResponseUpdateProfile:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Profile with id 1 has been successfully updated!
-        data:
-          allOf:
-            - $ref: '#/components/schemas/Profile'
-          example:
-            profile_name: pinco_pallino
-            bio: 'Questo è il profilo di Pinco Pallino'
-            picture_url: null
-            is_private: true
-            created_at: 2023-04-04T16:08:30Z
-            updated_at: 2023-06-05T20:05:20Z
-            deleted_at: null
-            blocked_untill: null
-            version: 2
-            account:
-              id: 1
-              email: pinco_pallino@gmail.com
-              name: Pinco
-              surname: Pallino
-              birthdate: 1980-05-14
-              gender: male
-              password: ab324bnmbnew
-              crc: aadadeweewer
-              validated_at: 2023-04-04T16:08:30Z
-              updated_at: 2023-06-05T20:05:20Z
-              deleted_at: null
-              version: 1
-              
-    ApiResponseProfileBadRequest:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: false
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 400
-        message:
-          type: string
-          description: Http status description
-          example: Profile not updated! Data provided are invalid!
-        data:
-          $ref: '#/components/schemas/ProfileBadRequest'
-          
-    ProfileBadRequest:
-      type: object
-      properties:
-        profile_name:
-          type: string
-          example: 'profile_name is required'
-        bio:
-          type: string
-          example: 'bio is required'
-        picture_url:
-          type: string
-          example: 'bio is required'
-        is_private:
-          type: string
-          example: 'is_private is required'
-        created_at:
-          type: string
-          example: 'created_at is required'
-        updated_at:
-          type: string
-          example: 'updated_at is required'
-        deleted_at:
-          type: string
-          example: 'deleted_at is required'
-        blocked_until:
-          type: string
-          example: 'blocked_until is required'
-        version:
-          type: string
-          example: 'version is required'
-        account:
-          type: string
-          example: 'account is required'
-          
-    ApiResponseDeleteProfile:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Profile with id 1 has been successfully deleted!
-        data:
-          type: object
-          example: null
-
-    ApiResponseFindAllFollowers:
-      type: object
-      properties:
-        flag:
-          type: boolean
-          description: Success or not
-          nullable: false
-          example: true
-        code:
-          type: integer
-          format: int32
-          nullable: false
-          description: Http stuts code
-          example: 200
-        message:
-          type: string
-          description: Http status description
-          example: Followers returned
-        data:
-          $ref: '#/components/schemas/FollowsList'
-          
+          minLength: 1
+          example: Internal Server Error
+      required:
+      - error
