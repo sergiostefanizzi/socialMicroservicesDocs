@@ -23,6 +23,8 @@ tags:
     description: All about profiles
   - name: follows
     description: All about profiles followers and followings
+  - name: posts
+    description: All about posts
 paths:
   /accounts:
     post:
@@ -373,7 +375,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile'#Questo da cambiare con FullProfile con i post
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/Profile'
+                  post_list:
+                    $ref: '#/components/schemas/PostList'
         '400':
           description: Bad request! Ids not valid
           content:
@@ -874,9 +881,236 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
   
-  /profiles/{profileId}/followed/{followerId}:              
-
-      
+  /posts:
+    post:
+      tags:
+        - posts
+      summary: Publish a new post
+      description: Publish a new post
+      operationId: addPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '201':
+          description: Post has been successfully published!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request! Post has not been published!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ['content_url is mandatory','post_type is mandatory']
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Post'
+                    example:
+                      content_url: 
+                      caption: post caption
+                      post_type: 
+                required:
+                - content_url
+                - post_type
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+              
+  /posts/{postId}:
+    get:
+      tags:
+        - posts
+      summary: Find a post
+      description: Find a post
+      operationId: findPostById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Post found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - posts
+      summary: Update post caption
+      description: Update post caption
+      operationId: updatePostById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+              required:
+              - caption
+      responses:
+        '200':
+          description: Post caption updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - posts
+      summary: Delete post 
+      description: Delete post
+      operationId: deletePostById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Post has been successfully deleted!
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /feed/{profileId}:
+    get:
+      tags:
+        - posts
+      summary: Feed of the profile
+      description: Feed of the profile
+      operationId: profileFeedById
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Feed found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+        '400':
+          description: Bad request! Id not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
 components:
   schemas:
     
@@ -954,11 +1188,38 @@ components:
         - follower_id
         - followed_id
         - accepted
+        
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        content_url:
+          type: string
+          minLength: 1
+          example: http://www.contentUrl.com/2342
+        caption:
+          type: string
+          maxLength: 2200
+        post_type:
+          format: string
+          enum: [POST,STORY]
+      required:
+        - content_url
+        - post_type
     
     ProfileList:
       type: array
       items:
         $ref: '#/components/schemas/Profile'
+    
+    PostList:
+      type: array
+      items: 
+        $ref: '#/components/schemas/Post'
+        
     
     Account404:
       type: object
