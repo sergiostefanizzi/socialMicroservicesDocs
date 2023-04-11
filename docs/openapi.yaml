@@ -25,6 +25,14 @@ tags:
     description: All about profiles followers and followings
   - name: posts
     description: All about posts
+  - name: likes
+    description: All about likes
+  - name: comments
+    description: All about comments
+  - name: alerts
+    description: All about alerts
+  - name: admins
+    description: All about admins
 paths:
   /accounts:
     post:
@@ -214,7 +222,7 @@ paths:
         '204':
           description: Account has been successfully deleted!
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -382,7 +390,7 @@ paths:
                   post_list:
                     $ref: '#/components/schemas/PostList'
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -512,7 +520,7 @@ paths:
         '204':
           description: Profile has been successfully deleted!
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -618,7 +626,7 @@ paths:
                   followed_id: 2
                   accepted: false
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -661,7 +669,7 @@ paths:
         '204':
           description: Profile has been successfully unfollowed!
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -718,7 +726,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Follows'
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -769,7 +777,7 @@ paths:
         '204':
           description: Profile has been successfully blocked!
         '400':
-          description: Bad request! Ids not valid
+          description: Bad request! Ids are not valid
           content:
             application/json:
               schema:
@@ -809,7 +817,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileList'
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
@@ -856,7 +864,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileList'
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
@@ -952,7 +960,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
@@ -1005,7 +1013,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
@@ -1044,7 +1052,7 @@ paths:
         '204':
           description: Post has been successfully deleted!
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
@@ -1089,13 +1097,156 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostList'
         '400':
-          description: Bad request! Id not valid
+          description: Bad request! Id is not valid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '404':
           description: Profile Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /likes/{postId}/by/{profileId}:
+    post:
+      tags:
+        - likes
+      summary: Profile likes a post
+      description: Profile likes a post
+      operationId: addLike
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the liked post
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: profileId
+          in: path
+          description: Id of the profile that likes a post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Like added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+        '400':
+          description: Bad request! Ids are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile or Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile or Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
+    delete:
+      tags:
+        - likes
+      summary: Remove like
+      description: Remove like
+      operationId: deleteLikeById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the liked post
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: profileId
+          in: path
+          description: Id of the profile that likes a post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Like has been removed
+        '400':
+          description: Bad request! Ids are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile or Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile or Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /likes/{postId}:
+    get:
+      tags:
+        - likes
+      summary: List of likes of a post
+      description: List of likes of a post
+      operationId: findAllLikesById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the liked post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of likes found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeList'
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
           content:
             application/json:
               schema:
@@ -1110,7 +1261,423 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
+                
+  /comments/{postId}/by/{profileId}:
+    post:
+      tags:
+        - comments
+      summary: Profile comments a post
+      description: Profile comments a post
+      operationId: addComment
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: profileId
+          in: path
+          description: Id of the profile that commented a post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: Comment added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad request! Ids are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile or Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile or Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - comments
+      summary: Edit a comment
+      description: Edit a comment
+      operationId: updateCommentById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: profileId
+          in: path
+          description: Id of the profile that comments a post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '200':
+          description: Comment has been successfully update!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+    delete:
+      tags:
+        - comments
+      summary: Remove comment
+      description: Remove comment
+      operationId: deleteCommentById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: profileId
+          in: path
+          description: Id of the profile that comments a post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Comment has been removed
+        '400':
+          description: Bad request! Ids are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile or Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile or Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /comments/{postId}:
+    get:
+      tags:
+        - comments
+      summary: List of comments of a post
+      description: List of comments of a post
+      operationId: findAllCommentsById
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: List of comments found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /alerts/profile/{profileId}:
+    post:
+      tags:
+        - alerts
+      summary: Send a profile alert
+      description: Send a profile alert
+      operationId: addProfileAlert
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of the profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alert'
+      responses:
+        '201':
+          description: Alert added
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Alert'
+                example:
+                  id: 1
+                  profile_id: 1
+                  post_id: null
+                  reason: reason example
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Profile Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Profile Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /alerts/post/{postId}:
+    post:
+      tags:
+        - alerts
+      summary: Send a post alert
+      description: Send a post alert
+      operationId: addPostAlert
+      parameters:
+        - name: postId
+          in: path
+          description: Id of the post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alert'
+      responses:
+        '201':
+          description: Alert added
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Alert'
+                example:
+                  id: 1
+                  profile_id: null
+                  post_id: 1
+                  reason: reason example
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Post Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /admins/{accountId}:
+    post:
+      tags:
+        - admins
+      summary: Create an admin
+      description: Create an admin
+      operationId: addAdminById
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Admin created!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '400':
+          description: Bad request! Admin has not been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Account Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Account Not Found
+        '409':
+          description: Conflict! Admin already created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 1
+                    example: Admin already exists 
+                  data:
+                    $ref: '#/components/schemas/Admin'
+                required:
+                - errors
+                - data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
+    delete:
+      tags:
+        - admins
+      summary: Remove an admin
+      description: Remove an admin
+      operationId: deleteAdminById
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Admin has been successfully removed!
+        '400':
+          description: Bad request! Admin has not been removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Account Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Account Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    
 components:
   schemas:
     
@@ -1210,6 +1777,87 @@ components:
         - content_url
         - post_type
     
+    Like:
+      type: object
+      properties:
+        profile_id:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        post_id:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 2
+      required:
+        - profile_id
+        - post_id
+    
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        profile_id:
+          type: integer
+          format: int64
+          readOnly: true
+        post_id:
+          type: integer
+          format: int64
+          readOnly: true
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2200
+          example: comment example
+      required:
+        - id
+        - profile_id
+        - post_id
+        - content
+    
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        profile_id:
+          type: integer
+          format: int64
+          readOnly: true
+          nullable: true
+        post_id:
+          type: integer
+          format: int64
+          readOnly: true
+          nullable: true
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          example: reason example
+      required:
+      - id
+      - profile_id
+      - post_id
+      - reason
+    
+    Admin:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+      required:
+        - id
+        
     ProfileList:
       type: array
       items:
@@ -1220,7 +1868,21 @@ components:
       items: 
         $ref: '#/components/schemas/Post'
         
+    LikeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Like'
     
+    CommentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Comment'
+    
+    AlertList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Alert'
+  
     Account404:
       type: object
       properties:
@@ -1248,7 +1910,7 @@ components:
         error: 
           type: string
           minLength: 3
-          example: Bad request! Id not valid
+          example: Bad request! Id is not valid
     
     InternalServerError:
       type: object
