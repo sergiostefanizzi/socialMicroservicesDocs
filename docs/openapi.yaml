@@ -1680,7 +1680,7 @@ paths:
             type: boolean
       responses:
         '200':
-          description: List of all account found and returned
+          description: List of all accounts found and returned
           content:
             appication/json:
               schema:
@@ -1701,7 +1701,7 @@ paths:
       parameters:
         - name: removedProfile
           in: query
-          description: Show or not show removed profiels
+          description: Show or not show removed profiles
           required: true
           schema:
             type: boolean
@@ -2100,7 +2100,6 @@ components:
         managed_by:
           type: integer
           format: int64
-          writeOnly: true
       required:
       - id
       - profile_id
