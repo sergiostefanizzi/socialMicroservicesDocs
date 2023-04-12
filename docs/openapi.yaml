@@ -114,6 +114,8 @@ paths:
       summary: Account activation
       description: Account activation
       operationId: activateAccountById
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountId
           in: path
@@ -138,6 +140,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
+        '401':
+          description: Action is unauthorized!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '403':
           description: Action is forbidden!
           content:
@@ -163,6 +171,8 @@ paths:
       summary: Delete an account
       description: Delete an account
       operationId: deleteAccountById
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountId
           in: path
@@ -211,6 +221,8 @@ paths:
       summary: Update an account
       description: Update name, surname, gender or password of an account
       operationId: updateAccountById
+      security:
+        - bearerAuth: []
       parameters:
       - name: accountId
         in: path
@@ -281,6 +293,8 @@ paths:
       summary: Create a profile
       description: create a profile
       operationId: addProfile
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -358,6 +372,8 @@ paths:
       summary: Find a profile
       description: Find a profile by id
       operationId: findProfileById
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -415,6 +431,8 @@ paths:
       summary: Update a profile
       description: Update a profile by id
       operationId: updateProfileById
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -521,6 +539,8 @@ paths:
       summary: Delete a profile
       description: Delete a profile
       operationId: deleteProfileById
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -570,6 +590,8 @@ paths:
       summary: Search profiles by name
       description: Seach profiles by name
       operationId: searchProfileByProfileName
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileName
           in: query
@@ -623,6 +645,8 @@ paths:
       summary: A profile follows another profile
       description: A profile follows another profile
       operationId: addFollows
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -693,6 +717,8 @@ paths:
       summary: Delete a following
       description: Delete a following
       operationId: deleteFollowing
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -749,6 +775,8 @@ paths:
       summary: Accept follow request for private profile
       description: Accept follow request for private profile
       operationId: accpetFollows
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -816,6 +844,8 @@ paths:
       summary: Block a follower
       description: Block a follower
       operationId: deleteFollower
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -871,6 +901,9 @@ paths:
         - follows
       summary: Get profile followers
       description: Get profile followers
+      operationId: findAllFollowers
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -924,6 +957,9 @@ paths:
         - follows
       summary: Get profile followings
       description: Get profile followings
+      operationId: findAllFollowings
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -978,6 +1014,8 @@ paths:
       summary: Publish a new post
       description: Publish a new post
       operationId: addPost
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -1038,6 +1076,8 @@ paths:
       summary: Find a post
       description: Find a post
       operationId: findPostById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1093,6 +1133,8 @@ paths:
       summary: Update post caption
       description: Update post caption
       operationId: updatePostById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1158,6 +1200,8 @@ paths:
       summary: Delete post 
       description: Delete post
       operationId: deletePostById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1211,6 +1255,8 @@ paths:
       summary: Feed of the profile
       description: Feed of the profile
       operationId: profileFeedById
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -1268,6 +1314,8 @@ paths:
       summary: Profile likes a post
       description: Profile likes a post
       operationId: addLike
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1331,6 +1379,8 @@ paths:
       summary: Remove like
       description: Remove like
       operationId: deleteLikeById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1390,6 +1440,8 @@ paths:
       summary: List of likes of a post
       description: List of likes of a post
       operationId: findAllLikesById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1447,6 +1499,8 @@ paths:
       summary: Profile comments a post
       description: Profile comments a post
       operationId: addComment
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1514,6 +1568,8 @@ paths:
       summary: Edit a comment
       description: Edit a comment
       operationId: updateCommentById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1582,6 +1638,8 @@ paths:
       summary: Remove comment
       description: Remove comment
       operationId: deleteCommentById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1641,6 +1699,8 @@ paths:
       summary: List of comments of a post
       description: List of comments of a post
       operationId: findAllCommentsById
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1698,6 +1758,8 @@ paths:
       summary: Send a profile alert
       description: Send a profile alert
       operationId: addProfileAlert
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -1773,6 +1835,8 @@ paths:
       summary: Send a post alert
       description: Send a post alert
       operationId: addPostAlert
+      security:
+        - bearerAuth: []
       parameters:
         - name: postId
           in: path
@@ -1848,6 +1912,8 @@ paths:
       summary: Create an admin
       description: Create an admin
       operationId: addAdminById
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountId
           in: path
@@ -1920,6 +1986,8 @@ paths:
       summary: Remove an admin
       description: Remove an admin
       operationId: deleteAdminById
+      security:
+        - bearerAuth: []
       parameters:
         - name: accountId
           in: path
@@ -1973,6 +2041,8 @@ paths:
       summary: List of all the accounts
       description: List of all the accounts
       operationId: findAllAccounts
+      security:
+        - bearerAuth: []
       parameters:
         - name: removedAccount
           in: query
@@ -2012,6 +2082,8 @@ paths:
       summary: List of all the profiles
       description: List of all the profiles
       operationId: findAllProfiles
+      security:
+        - bearerAuth: []
       parameters:
         - name: removedProfile
           in: query
@@ -2052,6 +2124,8 @@ paths:
       summary: Block a profile
       description: Block a profile
       operationId: blockProfileById
+      security:
+        - bearerAuth: []
       parameters:
         - name: profileId
           in: path
@@ -2119,6 +2193,8 @@ paths:
       summary: List of all the alerts
       description: List of all the alerts
       operationId: findAllAlerts
+      security:
+        - bearerAuth: []
       parameters:
         - name: remmovedAlerts
           in: query
@@ -2159,6 +2235,8 @@ paths:
       summary: List of all the alerts assigned to an admin
       description: List of all the alerts assigned to an admin
       operationId: findAllAlertsByAdminId
+      security:
+        - bearerAuth: []
       parameters:
         - name: adminId
           in: path
@@ -2223,6 +2301,8 @@ paths:
       summary: Return an alert
       description: Return an alert
       operationId: findAlertsById
+      security:
+        - bearerAuth: []
       parameters:
         - name: alertId
           in: path
@@ -2269,6 +2349,8 @@ paths:
       summary: Assing an alert to and admin
       description: Assing an alert to and admin
       operationId: updateAlertById
+      security:
+        - bearerAuth: []
       parameters:
         - name: alertId
           in: path
@@ -2336,6 +2418,8 @@ paths:
       summary: Close an alert
       description: Close an alert
       operationId: removeAlertById
+      security:
+        - bearerAuth: []
       parameters:
         - name: alertId
           in: path
@@ -2623,7 +2707,7 @@ components:
           example: Profile not found
       required:
       - error
-    
+      
     Unauthorized:
       type: object
       properties:
@@ -2657,3 +2741,10 @@ components:
           example: Internal Server Error
       required:
       - error
+      
+      
+  securitySchemes:
+    bearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
