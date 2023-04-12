@@ -59,7 +59,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  errors:
+                  error:
                     type: array
                     example: ['birthdate is mandatory','gender is mandatory']
                     items:
@@ -74,7 +74,7 @@ paths:
                       birthdate: null
                       gender: null
                 required:
-                - errors
+                - error
                 - data
         '409':
           description: Conflict! Account already created
@@ -300,7 +300,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  errors:
+                  error:
                     type: array
                     items:
                       type: string
@@ -314,7 +314,7 @@ paths:
                       picture_url: string
                       is_private: null
                 required:
-                - errors
+                - error
                 - data
         '401':
           description: Action is unauthorized!
@@ -342,7 +342,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Profile'
                 required:
-                - errors
+                - error
                 - data
         '500':
           description: Internal Server Error
@@ -997,7 +997,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  errors:
+                  error:
                     type: array
                     items:
                       type: string
@@ -1905,7 +1905,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Admin'
                 required:
-                - errors
+                - error
                 - data
         '500':
           description: Internal Server Error
@@ -2606,7 +2606,7 @@ components:
     Account404:
       type: object
       properties:
-        errors:
+        error:
           type: array
           example: ['Account Not found']
           items:
