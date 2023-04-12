@@ -54,35 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    format: int64
-                  email:
-                    type: string
-                    format: email
-                    minLength: 3
-                    maxLength: 320
-                  name:
-                    type: string
-                    minLength: 2
-                    maxLength: 50
-                  surname:
-                    type: string
-                    minLength: 2
-                    maxLength: 50
-                  birthdate:
-                    type: string
-                    format: date-time
-                  gender:
-                    type: string
-                    enum: [MALE, FEMALE, OTHER]
-                required:
-                - id
-                - email
-                - birthdate
-                - gender
+                $ref: '#/components/schemas/Account'
         '400':
           description: Bad request! Account was not created
           content:
@@ -1484,7 +1456,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Alert'
+              type: object
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required:
+              - reason
       responses:
         '201':
           description: Alert added
@@ -1540,7 +1519,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Alert'
+              type: object
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required:
+              - reason
       responses:
         '201':
           description: Alert added
@@ -1662,7 +1648,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '404':
-          description: Account Not Found!
+          description: Admin Not Found!
           content:
             application/json:
               schema:
@@ -1670,7 +1656,177 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: Account Not Found
+                    example: Admin Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /admins/accounts:
+    get:
+      tags:
+        - admins
+      summary: List of all the accounts
+      description: List of all the accounts
+      operationId: findAllAccounts
+      parameters:
+        - name: removedAccount
+          in: query
+          description: Show or not show removed or accounts
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of all account found and returned
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /admins/profiles:
+    get:
+      tags:
+        - admins
+      summary: List of all the profiles
+      description: List of all the profiles
+      operationId: findAllProfiles
+      parameters:
+        - name: removedProfile
+          in: query
+          description: Show or not show removed profiels
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of all profiles found and returned
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/ProfileList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /admins/alerts:
+    get:
+      tags:
+        - admins
+      summary: List of all the alerts
+      description: List of all the alerts
+      operationId: findAllAlerts
+      parameters:
+        - name: remmovedAlerts
+          in: query
+          description: Show or not show removed alerts
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of all alerts found and returned
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+  /admin/alerts/{adminId}:
+    get:
+      tags:
+        - admins
+      summary: List of all the alerts assigned to an admin
+      description: List of all the alerts assigned to an admin
+      operationId: findAllAlertsByAdminId
+      parameters:
+        - name: adminId
+          in: path
+          description: Id of the admin
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: remmovedAlerts
+          in: query
+          description: Show or not show removed alerts
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of all alerts found and returned
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Bad request! Alert has not been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Alert Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Alert Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  
+  /admin/alerts/{alertId}:
+    get:
+      tags:
+        - admins
+      summary: Return an alert
+      description: Return an alert
+      operationId: findAlertsById
+      parameters:
+        - name: alertId
+          in: path
+          description: Id of the alert
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: remmovedAlerts
+          in: query
+          description: Show or not show removed alerts
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Alert found and returned
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
         '500':
           description: Internal Server Error
           content:
@@ -1678,12 +1834,111 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
     
+    patch:
+      tags:
+        - admins
+      summary: Assing an alert to and admin
+      description: Assing an alert to and admin
+      operationId: updateAlertById
+      parameters:
+        - name: alertId
+          in: path
+          description: Id of the alert
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                managed_by:
+                  type: integer
+                  format: int64
+              required:
+              - managed_by
+      responses:
+        '200':
+          description: Alert has been successfully assigned!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Alert Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+                
+    delete:
+      tags:
+        - admins
+      summary: Close an alert
+      description: Close an alert
+      operationId: removeAlertById
+      parameters:
+        - name: alertId
+          in: path
+          description: Id of the alert
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Alert has been successfully closed!
+        '400':
+          description: Bad request! Id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdBadRequest'
+        '404':
+          description: Alert Not Found!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Post Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'   
+            
 components:
   schemas:
     
     Account:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
         email:
           type: string
           format: email
@@ -1842,6 +2097,10 @@ components:
           minLength: 1
           maxLength: 2000
           example: reason example
+        managed_by:
+          type: integer
+          format: int64
+          writeOnly: true
       required:
       - id
       - profile_id
@@ -1857,7 +2116,12 @@ components:
           readOnly: true
       required:
         - id
-        
+      
+    AccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+      
     ProfileList:
       type: array
       items:
