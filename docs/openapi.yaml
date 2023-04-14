@@ -217,7 +217,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account404'
+                type: object
+                properties:
+                  error:
+                    type: array
+                    example: ['Account Not found']
+                    items:
+                      type: string
+                required:
+                - error
         '500':
           description: Internal Server Error
           content:
@@ -334,7 +342,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile404'
+                $ref: '#/components/schemas/ProfileNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -451,7 +459,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile404'
+                $ref: '#/components/schemas/ProfileNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -562,7 +570,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile404'
+                $ref: '#/components/schemas/ProfileNotFound'
         '409':
           description: Request has been already sent!
           content:
@@ -626,7 +634,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile404'
+                $ref: '#/components/schemas/ProfileNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -749,7 +757,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile404'
+                $ref: '#/components/schemas/ProfileNotFound'
         '500':
           description: Internal Server Error
           content:
@@ -2539,19 +2547,9 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Alert'
-  
-    Account404:
-      type: object
-      properties:
-        error:
-          type: array
-          example: ['Account Not found']
-          items:
-            type: string
-      required:
-      - error
 
-    Profile404:
+
+    ProfileNotFound:
       type: object
       properties:
         error:
