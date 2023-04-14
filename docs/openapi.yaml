@@ -64,18 +64,6 @@ paths:
                     example: ['birthdate is mandatory','gender is mandatory']
                     items:
                       type: string
-                  data:
-                    oneOf:
-                      - $ref: '#/components/schemas/Account'
-                    example:
-                      email: user@example.com
-                      name: string
-                      surname: string
-                      birthdate: null
-                      gender: null
-                required:
-                - error
-                - data
         '409':
           description: Conflict! Account already created
           content:
@@ -87,19 +75,6 @@ paths:
                     type: string
                     minLength: 1
                     example: Email already exists  
-                  data:
-                    type: object
-                    properties:
-                      email:
-                        type: string
-                        format: email
-                        minLength: 3
-                        maxLength: 320
-                    required:
-                    - email
-                required:
-                - error
-                - data
         '500':
           description: Internal Server Error
           content:
@@ -140,24 +115,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
-        '401':
-          description: Action is unauthorized!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Action is forbidden!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
-        '404':
-          description: Account Not Found! The account has not been activated!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account404'
         '500':
           description: Internal Server Error
           content:
@@ -191,23 +148,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Action is forbidden!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
-        '404':
-          description: Account Not Found! The account has not been deleted!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account404'
+                $ref: '#/components/schemas/Unauthenticated'
         '500':
           description: Internal Server Error
           content:
@@ -262,17 +207,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Action is forbidden!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
+                $ref: '#/components/schemas/Unauthenticated'
         '404':
           description: Account Not Found! The account has not been activated!
           content:
@@ -319,29 +258,12 @@ paths:
                     items:
                       type: string
                     example: ['profile_name is mandatory','is_private is mandatory']
-                  data:
-                    oneOf:
-                      - $ref: '#/components/schemas/Profile'
-                    example:
-                      profile_name: null
-                      bio: string
-                      picture_url: string
-                      is_private: null
-                required:
-                - error
-                - data
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Forbidden! The account has not been activated!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
+                $ref: '#/components/schemas/Unauthenticated'
         '409':
           description: Conflict! Profile already created
           content:
@@ -353,11 +275,6 @@ paths:
                     type: string
                     minLength: 1
                     example: Profile already exists 
-                  data:
-                    $ref: '#/components/schemas/Profile'
-                required:
-                - error
-                - data
         '500':
           description: Internal Server Error
           content:
@@ -394,6 +311,12 @@ paths:
                     $ref: '#/components/schemas/Profile'
                   post_list:
                     $ref: '#/components/schemas/PostList'
+                  post_count:
+                    type: integer
+                    format: int32
+                    minimum: 0
+                  profile_granted:
+                    type: boolean
         '400':
           description: Bad request! Ids are not valid
           content:
@@ -401,17 +324,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Forbidden! The account has not been activated!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
+                $ref: '#/components/schemas/Unauthenticated'
         '404':
           description: Profile not found
           content:
@@ -447,10 +364,6 @@ paths:
             schema:
               type: object
               properties:
-                profile_name:
-                  type: string
-                  minLength: 3
-                  maxLength: 30
                 bio:
                   type: string
                   maxLength: 150
@@ -476,55 +389,18 @@ paths:
                     type: string
                     minLength: 1
                     example: Bad Request
-                  data:
-                    type: object
-                    properties:
-                      profile_name:
-                        type: string
-                        minLength: 3
-                        maxLength: 30
-                      bio:
-                        type: string
-                        maxLength: 150
-                      picture_url:
-                        type: string
-                      is_private:
-                        type: boolean
-                required:
-                - error
-                - data
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Forbidden'
-        '409':
-          description: Conflict! Profile name already exists
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    minLength: 1
-                    example: Profile name already exists
-                  data:
-                    type: object
-                    properties:
-                      profile_name:
-                        type: string
-                        minLength: 3
-                required:
-                - error
-                - data
         '500':
           description: Internal Server Error
           content:
@@ -559,11 +435,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -626,11 +502,11 @@ paths:
                     - profile_name
                     - picture_url
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '500':
           description: Internal Server Error
           content:
@@ -669,17 +545,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Follows'
-        '202':
-          description: The private profile that you want to follow has recived the request
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/Follows'
-                example:
-                  follower_id: 1
-                  followed_id: 2
-                  accepted: false
         '400':
           description: Bad request! Ids are not valid
           content:
@@ -687,23 +552,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '403':
-          description: Action is forbidden!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Forbidden'
+                $ref: '#/components/schemas/Unauthenticated'
         '404':
           description: Profile not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Profile404'
+        '409':
+          description: Request has been already sent!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden' #MOdifica
+
         '500':
           description: Internal Server Error
           content:
@@ -744,11 +610,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -793,12 +659,8 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        '204':
           description: Follow request accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Follows'
         '400':
           description: Bad request! Ids are not valid
           content:
@@ -806,11 +668,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -818,7 +680,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Forbidden'
         '404':
-          description: Profile not found
+          description: Request not found
           content:
             application/json:
               schema:
@@ -871,11 +733,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -895,7 +757,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
                 
-  /profiles/{profileId}/followers:
+  /profiles/{profileId}/followedBy:
     get:
       tags:
         - follows
@@ -926,11 +788,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '404':
           description: Profile not found
           content:
@@ -951,7 +813,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
                 
-  /profiles/{profileId}/followings:
+  /profiles/{profileId}/follows:
     get:
       tags:
         - follows
@@ -982,11 +844,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '404':
           description: Profile not found
           content:
@@ -1040,22 +902,12 @@ paths:
                     items:
                       type: string
                     example: ['content_url is mandatory','post_type is mandatory']
-                  data:
-                    oneOf:
-                      - $ref: '#/components/schemas/Post'
-                    example:
-                      content_url: 
-                      caption: post caption
-                      post_type: 
-                required:
-                - content_url
-                - post_type
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1100,11 +952,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1167,11 +1019,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1220,11 +1072,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1271,7 +1123,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostList'
+                $ref: '#/components/schemas/Feed'
         '400':
           description: Bad request! Id is not valid
           content:
@@ -1279,11 +1131,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1345,11 +1197,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1406,11 +1258,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1464,11 +1316,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1535,11 +1387,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1604,11 +1456,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1665,11 +1517,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1723,11 +1575,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1800,11 +1652,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1877,11 +1729,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1909,7 +1761,7 @@ paths:
     post:
       tags:
         - admins
-      summary: Create an admin
+      summary: Create an admin, NOT IMPLEMENTED
       description: Create an admin
       operationId: addAdminById
       security:
@@ -1936,11 +1788,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -1968,11 +1820,6 @@ paths:
                     type: string
                     minLength: 1
                     example: Admin already exists 
-                  data:
-                    $ref: '#/components/schemas/Admin'
-                required:
-                - error
-                - data
         '500':
           description: Internal Server Error
           content:
@@ -1983,7 +1830,7 @@ paths:
     delete:
       tags:
         - admins
-      summary: Remove an admin
+      summary: Remove an admin, blocco account
       description: Remove an admin
       operationId: deleteAdminById
       security:
@@ -2006,11 +1853,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2058,11 +1905,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccountList'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2099,11 +1946,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileList'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2156,11 +2003,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2210,11 +2057,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlertList'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2265,11 +2112,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2325,11 +2172,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Alert'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2384,11 +2231,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2438,11 +2285,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdBadRequest'
         '401':
-          description: Action is unauthorized!
+          description: Authentication is required!
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
+                $ref: '#/components/schemas/Unauthenticated'
         '403':
           description: Action is forbidden!
           content:
@@ -2541,8 +2388,9 @@ components:
           type: integer
           format: int64
           example: 2
-        accepted:
-          type: boolean
+        request_status:
+          type: string
+          enum: [ACCEPTED, PENDING, REJECTED]
       required:
         - follower_id
         - followed_id
@@ -2672,6 +2520,11 @@ components:
       items: 
         $ref: '#/components/schemas/Post'
         
+    Feed:
+      type: array
+      items: 
+        $ref: '#/components/schemas/Post'
+        
     LikeList:
       type: array
       items:
@@ -2708,14 +2561,14 @@ components:
       required:
       - error
       
-    Unauthorized:
+    Unauthenticated:
       type: object
       properties:
         error: 
           type: string
           minLength: 3
-          example: Action is unauthorized!
-    
+          example: Authentication is required!
+#Action is unauthenticated    
     Forbidden:
       type: object
       properties:
