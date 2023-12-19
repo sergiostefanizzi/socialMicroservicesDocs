@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-12-19T13:15:09.351Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="-NKsAroxSdF0QeecKKqW" version="22.1.11" type="device">
+<mxfile host="app.diagrams.net" modified="2023-12-19T13:18:51.693Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="F0SeDe5R1haKObyPWvV4" version="22.1.11" type="device">
   <diagram name="Page-1" id="ZnhcRez83flbBL1y2cS1">
     <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -254,7 +254,7 @@
             <mxPoint x="-27" y="7" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ZP-iLS_cB_QObKD_2yJ_-82" value="«component»&lt;br&gt;&lt;b&gt;Profile Database&lt;/b&gt;" style="html=1;dropTarget=0;whiteSpace=wrap;" parent="1" vertex="1">
+        <mxCell id="ZP-iLS_cB_QObKD_2yJ_-82" value="«component»&lt;br&gt;&lt;b&gt;Profile Repository&lt;/b&gt;" style="html=1;dropTarget=0;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="1030" y="1320" width="180" height="90" as="geometry" />
         </mxCell>
         <mxCell id="ZP-iLS_cB_QObKD_2yJ_-83" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" parent="ZP-iLS_cB_QObKD_2yJ_-82" vertex="1">
@@ -454,7 +454,7 @@
         <mxCell id="ZP-iLS_cB_QObKD_2yJ_-197" value="" style="ellipse;whiteSpace=wrap;html=1;align=center;aspect=fixed;resizable=0;points=[];outlineConnect=0;sketch=0;" parent="1" vertex="1">
           <mxGeometry x="35" y="875" width="10" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-1" value="" style="group" vertex="1" connectable="0" parent="1">
+        <mxCell id="NA_czQXuvPehvta7LYRA-1" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="870" y="670" width="180" height="260" as="geometry" />
         </mxCell>
         <mxCell id="ZP-iLS_cB_QObKD_2yJ_-36" value="Keycloak Authorization Server" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="NA_czQXuvPehvta7LYRA-1" vertex="1">
@@ -463,23 +463,23 @@
         <mxCell id="ZP-iLS_cB_QObKD_2yJ_-44" value="" style="rounded=0;whiteSpace=wrap;html=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="NA_czQXuvPehvta7LYRA-1" vertex="1">
           <mxGeometry y="130" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-2" value="" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="NA_czQXuvPehvta7LYRA-2" value="H2 DB" style="shape=datastore;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="1090" y="1500" width="60" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-3" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="NA_czQXuvPehvta7LYRA-3" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="1110" y="1400" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-7" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;" edge="1" target="NA_czQXuvPehvta7LYRA-9" parent="1" source="NA_czQXuvPehvta7LYRA-2">
+        <mxCell id="NA_czQXuvPehvta7LYRA-7" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;" parent="1" source="NA_czQXuvPehvta7LYRA-2" target="NA_czQXuvPehvta7LYRA-9" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1140" y="1460" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-8" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="NA_czQXuvPehvta7LYRA-9" parent="1" source="NA_czQXuvPehvta7LYRA-3">
+        <mxCell id="NA_czQXuvPehvta7LYRA-8" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="NA_czQXuvPehvta7LYRA-3" target="NA_czQXuvPehvta7LYRA-9" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1340" y="1450" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="NA_czQXuvPehvta7LYRA-9" value="" style="ellipse;whiteSpace=wrap;html=1;align=center;aspect=fixed;fillColor=none;strokeColor=none;resizable=0;perimeter=centerPerimeter;rotatable=0;allowArrows=0;points=[];outlineConnect=1;" vertex="1" parent="1">
+        <mxCell id="NA_czQXuvPehvta7LYRA-9" value="" style="ellipse;whiteSpace=wrap;html=1;align=center;aspect=fixed;fillColor=none;strokeColor=none;resizable=0;perimeter=centerPerimeter;rotatable=0;allowArrows=0;points=[];outlineConnect=1;" parent="1" vertex="1">
           <mxGeometry x="1115" y="1455" width="10" height="10" as="geometry" />
         </mxCell>
       </root>
